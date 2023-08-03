@@ -42,9 +42,9 @@ public class ExchangeRateHttpOutput {
 
         } catch (Exception e) {
             String message = String.format(
-                    "[EXCEPTION]: %s. Error executing a request to 3rd party system to get the latest exchange rate. " +
+                    "[EXCEPTION]: %s. Description: Error executing a request to 3rd party system to get the latest exchange rate. " +
                     "URI: %s. Number of retries: %s.", e.getClass(), preparedUri, RETRIES_COUNTER.count());
-            log.warn(message + " Remote addr: {}", request.getRemoteAddr());
+            log.warn("Exception message: {}. " + message + " Remote addr: {}.", e.getMessage(), request.getRemoteAddr());
             throw new RequestToExchangeRateApiException(message);
 
         }
