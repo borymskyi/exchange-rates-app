@@ -3,12 +3,11 @@
 IMAGE_KEY="exchange-rates-app"
 IMAGE_NAME="dimoks/$IMAGE_KEY-image"
 CONTAINER_NAME="exchange-rates-app"
-PORT=8080
 
 docker container stop $CONTAINER_NAME
 docker container rm $CONTAINER_NAME
 docker run --name $CONTAINER_NAME \
-  -p $PORT:$PORT \
+  -p $APP_PORT:$APP_PORT \
   -e "JAVA_OPTS=-DAPP_PORT=\
     -DSENTRY_DSN= \
     -DPROVIDER_AVCURRENCY_URL= \

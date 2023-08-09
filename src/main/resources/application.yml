@@ -1,19 +1,12 @@
 server:
   port: ${APP_PORT}
 
-sentry:
-  dsn: ${SENTRY_DSN}
-  logging:
-    enabled: false
-
 provider:
   AVCurrency:
     url: ${PROVIDER_AVCURRENCY_URL}
   AVExchangeRate:
-    #from_currency=base to_currency=target
     url: ${PROVIDER_AVEXCHANGERATE_URL}
   AVHistoricExchangeRateProvider:
     url: ${PROVIDER_AVHISTORIC_URL}
   V6ExchangeRate:
-    #base - USD/ target - UAH
     url: ${PROVIDER_V6EXCHANGERATE_URL}
