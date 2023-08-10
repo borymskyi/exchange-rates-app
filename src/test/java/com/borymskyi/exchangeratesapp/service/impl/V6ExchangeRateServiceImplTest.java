@@ -15,16 +15,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class AVExchangeRateServiceImplTest {
+class V6ExchangeRateServiceImplTest {
 
     @InjectMocks
-    private AVExchangeRateServiceImpl avExchangeRateService;
+    private V6ExchangeRateServiceImpl v6ExchangeRateService;
 
     @Mock
     private ExchangeRateHttpOutput exchangeClient;
@@ -35,9 +34,9 @@ class AVExchangeRateServiceImplTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(
-                avExchangeRateService,
-                "aVExchangeRateUrl",
-                "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=%s&to_currency=%s"
+                v6ExchangeRateService,
+                "v6ExchangeRateUrl",
+                "https://v6.exchangerate-api.com/v6/pair/%s/%s"
         );
     }
 
@@ -46,34 +45,37 @@ class AVExchangeRateServiceImplTest {
         JsonNode preparedJsonNode = getValidJsonLatestExchangeRate();
         doReturn(preparedJsonNode).when(exchangeClient).sendRequestToGetLatestExchangeRateByPreparedURI(any());
 
-        JsonNode actual = avExchangeRateService.getLatestExchangeRateAsJson(base, target);
+        JsonNode actual = v6ExchangeRateService.getLatestExchangeRateAsJson(base, target);
 
-        assertThat(actual).isNotNull();
+        assertNotNull(actual);
         verify(exchangeClient, times(1)).sendRequestToGetLatestExchangeRateByPreparedURI(any());
     }
 
     @Test
     void getLatestExchangeRateAsJson_firstCase_shouldThrowRequestToExchangeRateApiException() {
-        JsonNode preparedJsonNode = getJsonLatestExchangeRateWithError();
+        JsonNode preparedJsonNode = getJsonLatestExchangeRateWithErrorFirstCase();
         doReturn(preparedJsonNode).when(exchangeClient).sendRequestToGetLatestExchangeRateByPreparedURI(any());
 
-        assertThrows(RequestToExchangeRateApiException.class, () -> avExchangeRateService.getLatestExchangeRateAsJson(base, target));
+        assertThrows(RequestToExchangeRateApiException.class, () -> v6ExchangeRateService.getLatestExchangeRateAsJson(base, target));
         verify(exchangeClient, times(1)).sendRequestToGetLatestExchangeRateByPreparedURI(any());
     }
 
     @Test
     void getLatestExchangeRateAsJson_secondCase_shouldThrowRequestToExchangeRateApiException() {
-        JsonNode preparedJsonNode = getJsonLatestExchangeRateWithSecondError();
+        JsonNode preparedJsonNode = getJsonLatestExchangeRateWithErrorSecondCase();
         doReturn(preparedJsonNode).when(exchangeClient).sendRequestToGetLatestExchangeRateByPreparedURI(any());
 
-        assertThrows(RequestToExchangeRateApiException.class, () -> avExchangeRateService.getLatestExchangeRateAsJson(base, target));
+        assertThrows(RequestToExchangeRateApiException.class, () -> v6ExchangeRateService.getLatestExchangeRateAsJson(base, target));
         verify(exchangeClient, times(1)).sendRequestToGetLatestExchangeRateByPreparedURI(any());
     }
 
     @SneakyThrows
-    private JsonNode getJsonLatestExchangeRateWithError() {
+    private JsonNode getJsonLatestExchangeRateWithErrorFirstCase() {
         String jsonString = "{\n" +
-                "    \"Error Message\": \"Invalid API call. Please retry or visit the documentation (https://www.alphavantage.co/documentation/) for CURRENCY_EXCHANGE_RATE.\"\n" +
+                "    \"result\": \"error\",\n" +
+                "    \"documentation\": \"https://www.exchangerate-api.com/docs\",\n" +
+                "    \"terms-of-use\": \"https://www.exchangerate-api.com/terms\",\n" +
+                "    \"error-type\": \"invalid-key\"\n" +
                 "}";
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -81,9 +83,12 @@ class AVExchangeRateServiceImplTest {
     }
 
     @SneakyThrows
-    private JsonNode getJsonLatestExchangeRateWithSecondError() {
+    private JsonNode getJsonLatestExchangeRateWithErrorSecondCase() {
         String jsonString = "{\n" +
-                "    \"Error Message\": \"the parameter apikey is invalid or missing. Please claim your free API key on (https://www.alphavantage.co/support/#api-key). It should take less than 20 seconds.\"\n" +
+                "    \"result\": \"error\",\n" +
+                "    \"documentation\": \"https://www.exchangerate-api.com/docs\",\n" +
+                "    \"terms-of-use\": \"https://www.exchangerate-api.com/terms\",\n" +
+                "    \"error-type\": \"unsupported-code\"\n" +
                 "}";
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -94,7 +99,7 @@ class AVExchangeRateServiceImplTest {
     void parseLatestExchangeRateJson_shouldReturnParsedObject() {
         JsonNode dataWhichNeedParse = getValidJsonLatestExchangeRate();
 
-        ExchangeRateWithMetaData actual = avExchangeRateService.parseLatestExchangeRateJson(
+        ExchangeRateWithMetaData actual = v6ExchangeRateService.parseLatestExchangeRateJson(
                 dataWhichNeedParse, base, target
         );
 
@@ -108,17 +113,16 @@ class AVExchangeRateServiceImplTest {
     @SneakyThrows
     private JsonNode getValidJsonLatestExchangeRate() {
         String jsonString = "{\n" +
-                "    \"Realtime Currency Exchange Rate\": {\n" +
-                "        \"1. From_Currency Code\": \"USD\",\n" +
-                "        \"2. From_Currency Name\": \"United States Dollar\",\n" +
-                "        \"3. To_Currency Code\": \"UAH\",\n" +
-                "        \"4. To_Currency Name\": \"Ukrainian Hryvnia\",\n" +
-                "        \"5. Exchange Rate\": \"36.90920000\",\n" +
-                "        \"6. Last Refreshed\": \"2023-07-24 19:06:35\",\n" +
-                "        \"7. Time Zone\": \"UTC\",\n" +
-                "        \"8. Bid Price\": \"36.90826000\",\n" +
-                "        \"9. Ask Price\": \"36.91031000\"\n" +
-                "    }\n" +
+                "    \"result\": \"success\",\n" +
+                "    \"documentation\": \"https://www.exchangerate-api.com/docs\",\n" +
+                "    \"terms_of_use\": \"https://www.exchangerate-api.com/terms\",\n" +
+                "    \"time_last_update_unix\": 1691625601,\n" +
+                "    \"time_last_update_utc\": \"Thu, 10 Aug 2023 00:00:01 +0000\",\n" +
+                "    \"time_next_update_unix\": 1691712001,\n" +
+                "    \"time_next_update_utc\": \"Fri, 11 Aug 2023 00:00:01 +0000\",\n" +
+                "    \"base_code\": \"USD\",\n" +
+                "    \"target_code\": \"UAH\",\n" +
+                "    \"conversion_rate\": 36.8301\n" +
                 "}";
 
         ObjectMapper objectMapper = new ObjectMapper();

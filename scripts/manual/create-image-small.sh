@@ -16,7 +16,7 @@ else
   echo "----- file .env not found! -----"
 fi
 
-mvn clean install -DskipTests=true \
+mvn clean install -DskipTests=false \
   -DAPP_PORT="$APP_PORT" \
   -DSENTRY_DSN="$SENTRY_DSN" \
   -DPROVIDER_AVCURRENCY_URL="$PROVIDER_AVCURRENCY_URL" \

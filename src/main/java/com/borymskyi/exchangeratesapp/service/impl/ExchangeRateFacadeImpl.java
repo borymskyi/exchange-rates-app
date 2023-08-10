@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class ExchangeRateFacadeImpl implements ExchangeRateFacade {
+
     private final AVExchangeRateServiceImpl aVExchangeRateServiceImpl;
     private final V6ExchangeRateServiceImpl v6ExchangeRateServiceImpl;
     private final ExchangeRateMapper exchangeRateMapper;

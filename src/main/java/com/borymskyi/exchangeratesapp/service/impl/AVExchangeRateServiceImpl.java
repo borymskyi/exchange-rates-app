@@ -32,8 +32,7 @@ public class AVExchangeRateServiceImpl implements ExchangeRateService {
     @Autowired
     public AVExchangeRateServiceImpl(
             @Value("${provider.AVExchangeRate.url}") String aVExchangeRateUrl,
-            ExchangeRateHttpOutput exchangeClient,
-            HttpServletRequest request
+            ExchangeRateHttpOutput exchangeClient
     ) {
         this.aVExchangeRateUrl = aVExchangeRateUrl;
         this.exchangeClient = exchangeClient;
