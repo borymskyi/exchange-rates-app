@@ -1,15 +1,19 @@
 package com.borymskyi.exchangeratesapp.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
+
 @Builder
-@Data
+@RequiredArgsConstructor
+@Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ExchangeRateWithMetaDataDto {
+public class ExchangeRateWithMetaDataDto implements Serializable {
+
+    private static final long serialVersionUID = -4344153806575947962L;
 
     @JsonProperty(value = "meta_data")
     MetaDataDto metaData;

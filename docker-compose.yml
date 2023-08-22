@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+
+  redis01:
+    image: redis:latest
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: >
+      bash -c '
+        redis-server --requirepass ${REDIS_PASSWORD}
+      '
+    networks:
+      - api
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PROVIDER_AVCURRENCY_URL=${PROVIDER_AVCURRENCY_URL}
+      - PROVIDER_AVEXCHANGERATE_URL=${PROVIDER_AVEXCHANGERATE_URL}
+      - PROVIDER_AVHISTORIC_URL=${PROVIDER_AVHISTORIC_URL}
+      - PROVIDER_V6EXCHANGERATE_URL=${PROVIDER_V6EXCHANGERATE_URL}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    depends_on:
+      - redis01
+    networks:
+      - api
+
+networks:
+  api:
+    driver: bridge

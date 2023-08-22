@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -31,6 +32,7 @@ public class ExchangeRateFacadeImpl implements ExchangeRateFacade {
         this.exchangeRateMapper = exchangeRateMapper;
     }
 
+    @Cacheable(value = "latestExchangeRatesWithMinimumPrice", key = "{#base, #target}")
     @Override
     public ExchangeRateWithMetaDataDto getLatestExchangeRateWithMinimumPriceForBuying(CurrencyUnit base, CurrencyUnit target) {
         JsonNode json1;

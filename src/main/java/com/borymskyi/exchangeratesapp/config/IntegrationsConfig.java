@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextListener;
 
 @Configuration
-public class IntegrationsConfiguration {
+public class IntegrationsConfig {
 
     @Bean
     public ServletListenerRegistrationBean<RequestContextListener> requestContextListener() {
@@ -36,4 +36,5 @@ public class IntegrationsConfiguration {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
 }

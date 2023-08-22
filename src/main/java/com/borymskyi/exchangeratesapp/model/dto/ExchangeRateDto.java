@@ -1,15 +1,19 @@
 package com.borymskyi.exchangeratesapp.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
+
 @Builder
-@Data
+@RequiredArgsConstructor
+@Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ExchangeRateDto {
+public class ExchangeRateDto implements Serializable {
+
+    private static final long serialVersionUID = 4431461082604617301L;
 
     @JsonProperty(value = "base_currency_code")
     String baseCurrencyCode;
